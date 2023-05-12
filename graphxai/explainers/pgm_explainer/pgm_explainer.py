@@ -303,7 +303,7 @@ class PGMExplainer(_BaseExplainer):
         node_imp[pgm_nodes] = 1
 
         exp = Explanation(
-            node_imp = node_imp[subset],
+            node_imp = node_imp[subset.cpu()],
             node_idx = node_idx
         )
 

@@ -466,7 +466,7 @@ class Explanation:
                 _, emask = remove_duplicate_edges(self.enc_subgraph.edge_index)
                 # Remove self loops:
                 emask_2 = torch.logical_not(self.enc_subgraph.edge_index[0,:] == self.enc_subgraph.edge_index[1,:])
-                emask = emask & emask_2
+                emask = emask.cpu() & emask_2.cpu()
 
                 trimmed_enc_subg_edge_index = self.enc_subgraph.edge_index[:,emask]
 

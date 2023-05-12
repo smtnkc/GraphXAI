@@ -190,14 +190,14 @@ class SubgraphX(_BaseExplainer):
         # Need to parse results:
         node_mask, edge_mask = self.__parse_results(best_result, edge_index)
 
-        print('args', node_idx, self.L, edge_index)
+        #print('args', node_idx, self.L, edge_index)
         khop_info = k_hop_subgraph(node_idx, self.L, edge_index)
         subgraph_edge_mask = khop_info[3] # Mask over edges
 
         # Set explanation
         exp = Explanation(
-            node_imp = 1*node_mask[khop_info[0]], # Apply node mask
-            edge_imp = 1*edge_mask[subgraph_edge_mask],
+            node_imp = 1*node_mask[khop_info[0].cpu()], # Apply node mask
+            edge_imp = 1*edge_mask[subgraph_edge_mask.cpu()],
             node_idx = node_idx
         )
 
@@ -295,5 +295,5 @@ class SubgraphX(_BaseExplainer):
         n_mask = torch.zeros(num_nodes, dtype = torch.bool)
         n_mask[subgraph_nodes] = 1
 
-        edge_mask = n_mask[edge_index[0]] & n_mask[edge_index[1]]
+        edge_mask = n_mask[edge_index[0].cpu()] & n_mask[edge_index[1].cpu()]
         return node_mask, edge_mask

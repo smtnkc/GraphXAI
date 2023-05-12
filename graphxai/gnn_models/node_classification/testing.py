@@ -2,9 +2,8 @@ import ipdb
 import torch
 from torch_geometric.nn import GCNConv, GINConv, BatchNorm, SAGEConv, JumpingKnowledge, GATConv
 from torch_geometric.nn import Sequential
-
-import sklearn.metrics as metrics
-from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
+import numpy as np
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score, average_precision_score
 
 class GCN_1layer(torch.nn.Module):
     def __init__(self, input_feat, classes):
@@ -285,8 +284,8 @@ def test(model: torch.nn.Module, data, num_classes = 2, get_auc = False):
 
         # AUROC and AUPRC
         if get_auc:
-            auprc = metrics.average_precision_score(true_Y, probas, pos_label = 1)
-            auroc = metrics.roc_auc_score(true_Y, probas)
+            auprc = average_precision_score(true_Y, probas, pos_label = 1)
+            auroc = roc_auc_score(true_Y, probas)
 
             return test_score, acc, precision, recall, auprc, auroc
 
@@ -310,10 +309,93 @@ def val(model: torch.nn.Module, data, num_classes = 2, get_auc = False):
 
         # AUROC and AUPRC
         if get_auc:
-            auprc = metrics.average_precision_score(true_Y, probas, pos_label = 1)
-            auroc = metrics.roc_auc_score(true_Y, probas)
+            auprc = average_precision_score(true_Y, probas, pos_label = 1)
+            auroc = roc_auc_score(true_Y, probas)
 
             return test_score, acc, precision, recall, auprc, auroc
 
     
     return acc, f1_score(true_Y, pred[data.valid_mask].tolist())
+
+# ----------------------------------------------------------
+
+# def train(model, optimizer, criterion, dataloader):
+#     model.train()
+#     for data in dataloader:
+#         optimizer.zero_grad()  # Clear gradients.
+#         out = model(data.x, data.edge_index)  # Perform a single forward pass.
+#         loss = criterion(out[data.train_mask], data.y[data.train_mask])  # Compute the loss solely based on the training nodes.
+#         loss.backward()  # Derive gradients.
+#         optimizer.step()  # Update parameters based on gradients.
+#     return loss
+    
+# def test(model: torch.nn.Module, dataloader, num_classes, get_auc=False):
+#     model.eval()
+#     y_true = []
+#     y_pred = []
+#     y_proba = []
+#     with torch.no_grad():
+#         for data in dataloader:
+#             out = model(data.x, data.edge_index)
+#             pred = out.argmax(dim=1)  # Use the class with highest probability.
+#             probas = out.softmax(dim=1)[:, 1].detach().cpu().numpy()
+
+#             y_true.append(data.y[data.test_mask].cpu().numpy())
+#             y_pred.append(pred[data.test_mask].cpu().numpy())
+#             y_proba.append(probas[data.test_mask])
+
+#     y_true = np.concatenate(y_true)
+#     y_pred = np.concatenate(y_pred)
+#     y_proba = np.concatenate(y_proba)
+
+#     acc = accuracy_score(y_true, y_pred)
+#     if num_classes == 2:
+#         f1 = f1_score(y_true, y_pred)
+#         precision = precision_score(y_true, y_pred)
+#         recall = recall_score(y_true, y_pred)
+
+#         if get_auc:
+#             auprc = average_precision_score(y_true, y_proba, pos_label=1)
+#             auroc = roc_auc_score(y_true, y_proba)
+
+#             return f1, acc, precision, recall, auprc, auroc
+#     else:
+#         f1 = f1_score(y_true, y_pred, average='weighted')
+
+#     return acc, f1
+
+
+# def val(model: torch.nn.Module, dataloader, num_classes, get_auc = False):
+#     model.eval()
+#     y_true = []
+#     y_pred = []
+#     y_proba = []
+#     with torch.no_grad():
+#         for data in dataloader:
+#             out = model(data.x, data.edge_index)
+#             pred = out.argmax(dim=1)  # Use the class with highest probability.
+#             probas = out.softmax(dim=1)[:, 1].detach().cpu().numpy()
+
+#             y_true.append(data.y[data.val_mask].cpu().numpy())
+#             y_pred.append(pred[data.val_mask].cpu().numpy())
+#             y_proba.append(probas[data.val_mask])
+
+#     y_true = np.concatenate(y_true)
+#     y_pred = np.concatenate(y_pred)
+#     y_proba = np.concatenate(y_proba)
+
+#     acc = accuracy_score(y_true, y_pred)
+#     if num_classes == 2:
+#         f1 = f1_score(y_true, y_pred)
+#         precision = precision_score(y_true, y_pred)
+#         recall = recall_score(y_true, y_pred)
+
+#         if get_auc:
+#             auprc = average_precision_score(y_true, y_proba, pos_label=1)
+#             auroc = roc_auc_score(y_true, y_proba)
+
+#             return f1, acc, precision, recall, auprc, auroc
+#     else:
+#         f1 = f1_score(y_true, y_pred, average='weighted')
+
+#     return acc, f1

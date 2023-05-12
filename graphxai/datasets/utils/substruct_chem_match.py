@@ -28,13 +28,13 @@ from torch_geometric.utils.convert import to_networkx
 # O_vec = torch.zeros(7); O_vec[2] = 1 
 
 
-C_vec = torch.zeros(14); C_vec[0] = 1
-O_vec = torch.zeros(14); O_vec[1] = 1 
-Cl_vec = torch.zeros(14); Cl_vec[2] = 1
-H_vec = torch.zeros(14); H_vec[3] = 1
-N_vec = torch.zeros(14); N_vec[4] = 1
-F_vec = torch.zeros(14); F_vec[5] = 1
-Br_vec = torch.zeros(14); Br_vec[6] = 1
+C_vec = torch.zeros(7); C_vec[0] = 1
+O_vec = torch.zeros(7); O_vec[1] = 1 
+Cl_vec = torch.zeros(7); Cl_vec[2] = 1
+H_vec = torch.zeros(7); H_vec[3] = 1
+N_vec = torch.zeros(7); N_vec[4] = 1
+F_vec = torch.zeros(7); F_vec[5] = 1
+Br_vec = torch.zeros(7); Br_vec[6] = 1
 I_vec = torch.zeros(14); I_vec[9] = 1
 
 def make_NO2():
@@ -84,6 +84,7 @@ def match_NH2(G: nx.Graph, node: int):
 
     # See if their vectors are equal:
     node_vec = torch.as_tensor(G.nodes[node]['x'])
+
     if (torch.norm(node_vec - N_vec).item() == 0):
         return node
     else:
